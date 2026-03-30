@@ -1,0 +1,200 @@
+160
+
+
+jiancebuchu
+
+
+
+256
+
+
+[29] drone conf=0.35, depth=0.60 m, dx=-0.018 m, dy=-0.047 m, yaw=-0.030 rad
+0: 160x256 1 drone, Done. (0.287s)
+0: 160x256 Done. (0.346s)
+[31] drone conf=0.37, depth=0.63 m, dx=0.044 m, dy=-0.011 m, yaw=0.070 rad
+0: 160x256 1 drone, Done. (0.404s)
+[32] drone conf=0.38, depth=0.77 m, dx=0.086 m, dy=-0.003 m, yaw=0.112 rad
+0: 160x256 1 drone, Done. (0.408s)
+[33] drone conf=0.40, depth=0.63 m, dx=0.102 m, dy=-0.006 m, yaw=0.161 rad
+0: 160x256 1 drone, Done. (0.325s)
+[34] drone conf=0.32, depth=0.68 m, dx=0.122 m, dy=0.005 m, yaw=0.177 rad
+0: 160x256 1 drone, Done. (0.377s)
+[35] drone conf=0.39, depth=0.67 m, dx=0.121 m, dy=0.000 m, yaw=0.178 rad
+0: 160x256 1 drone, Done. (0.359s)
+[36] drone conf=0.28, depth=0.67 m, dx=0.117 m, dy=0.002 m, yaw=0.173 rad
+0: 160x256 1 drone, Done. (0.287s)
+[37] drone conf=0.27, depth=0.73 m, dx=0.125 m, dy=-0.000 m, yaw=0.169 rad
+0: 160x256 1 drone, Done. (0.323s)
+[38] drone conf=0.29, depth=0.73 m, dx=0.090 m, dy=-0.033 m, yaw=0.122 rad
+0: 160x256 1 drone, Done. (0.386s)
+
+
+320
+
+
+[730] drone conf=0.33, depth=1.15 m, dx=0.119 m, dy=-0.037 m, yaw=0.103 rad
+0: 192x320 1 drone, Done. (0.260s)
+[731] drone conf=0.33, depth=1.02 m, dx=0.108 m, dy=-0.022 m, yaw=0.106 rad
+0: 192x320 1 drone, Done. (0.280s)
+[732] drone conf=0.31, depth=0.94 m, dx=0.103 m, dy=-0.010 m, yaw=0.109 rad
+0: 192x320 1 drone, Done. (0.322s)
+[733] drone conf=0.30, depth=0.99 m, dx=0.114 m, dy=0.007 m, yaw=0.114 rad
+0: 192x320 1 drone, Done. (0.246s)
+[734] drone conf=0.25, depth=0.83 m, dx=0.102 m, dy=0.022 m, yaw=0.122 rad
+0: 192x320 1 drone, Done. (0.238s)
+[735] drone conf=0.37, depth=0.84 m, dx=0.104 m, dy=0.027 m, yaw=0.123 rad
+0: 192x320 1 drone, Done. (0.135s)
+[736] drone conf=0.34, depth=0.82 m, dx=0.103 m, dy=0.031 m, yaw=0.126 rad
+0: 192x320 1 drone, Done. (0.323s)
+[737] drone conf=0.37, depth=0.84 m, dx=0.108 m, dy=0.032 m, yaw=0.127 rad
+0: 192x320 1 drone, Done. (0.231s)
+[738] drone conf=0.35, depth=1.01 m, dx=0.119 m, dy=0.017 m, yaw=0.117 rad
+0: 192x320 1 drone, Done. (0.144s)
+[739] drone conf=0.30, depth=1.00 m, dx=0.108 m, dy=-0.003 m, yaw=0.107 rad
+0: 192x320 1 drone, Done. (0.156s)
+
+
+384
+
+
+[632] drone conf=0.48, depth=1.01 m, dx=0.125 m, dy=-0.013 m, yaw=0.123 rad
+0: 224x384 1 drone, Done. (0.253s)
+[633] drone conf=0.39, depth=1.04 m, dx=0.130 m, dy=-0.011 m, yaw=0.124 rad
+0: 224x384 1 drone, Done. (0.217s)
+[634] drone conf=0.41, depth=1.04 m, dx=0.133 m, dy=-0.011 m, yaw=0.127 rad
+0: 224x384 1 drone, Done. (0.251s)
+[635] drone conf=0.49, depth=0.98 m, dx=0.121 m, dy=-0.025 m, yaw=0.123 rad
+0: 224x384 1 drone, Done. (0.287s)
+[636] drone conf=0.44, depth=0.95 m, dx=0.120 m, dy=-0.029 m, yaw=0.125 rad
+0: 224x384 1 drone, Done. (0.216s)
+[637] drone conf=0.40, depth=1.05 m, dx=0.136 m, dy=-0.031 m, yaw=0.129 rad
+0: 224x384 1 drone, Done. (0.245s)
+[638] drone conf=0.38, depth=1.20 m, dx=0.145 m, dy=-0.003 m, yaw=0.120 rad
+0: 224x384 1 drone, Done. (0.261s)
+[639] drone conf=0.41, depth=0.99 m, dx=0.120 m, dy=0.008 m, yaw=0.121 rad
+0: 224x384 1 drone, Done. (0.268s)
+[640] drone conf=0.31, depth=1.09 m, dx=0.127 m, dy=0.017 m, yaw=0.117 rad
+0: 224x384 1 drone, Done. (0.200s)
+[641] drone conf=0.30, depth=1.04 m, dx=0.117 m, dy=0.014 m, yaw=0.112 rad
+
+
+416
+
+
+[252] drone conf=0.46, depth=0.78 m, dx=0.167 m, dy=0.022 m, yaw=0.211 rad
+0: 256x416 1 drone, Done. (0.128s)
+[253] drone conf=0.37, depth=0.91 m, dx=0.175 m, dy=0.023 m, yaw=0.189 rad
+0: 256x416 1 drone, Done. (0.129s)
+[254] drone conf=0.48, depth=0.92 m, dx=0.146 m, dy=0.017 m, yaw=0.158 rad
+0: 256x416 1 drone, Done. (0.189s)
+[255] drone conf=0.50, depth=0.95 m, dx=0.102 m, dy=0.004 m, yaw=0.106 rad
+0: 256x416 1 drone, Done. (0.166s)
+[256] drone conf=0.47, depth=0.74 m, dx=0.052 m, dy=-0.005 m, yaw=0.071 rad
+0: 256x416 1 drone, Done. (0.181s)
+[257] drone conf=0.55, depth=0.80 m, dx=0.045 m, dy=-0.009 m, yaw=0.056 rad
+0: 256x416 1 drone, Done. (0.108s)
+[258] drone conf=0.55, depth=0.87 m, dx=0.049 m, dy=-0.008 m, yaw=0.056 rad
+0: 256x416 1 drone, Done. (0.156s)
+[259] drone conf=0.48, depth=0.84 m, dx=0.035 m, dy=-0.008 m, yaw=0.042 rad
+0: 256x416 1 drone, Done. (0.135s)
+
+
+416 2  1111111111111111111111111111111111111
+
+
+[117] drone conf=0.58, depth=0.78 m, dx=0.118 m, dy=0.033 m, yaw=0.151 rad
+0: 256x416 1 drone, Done. (0.125s)
+[118] drone conf=0.41, depth=0.73 m, dx=0.118 m, dy=0.025 m, yaw=0.160 rad
+0: 256x416 1 drone, Done. (0.194s)
+[119] drone conf=0.50, depth=0.64 m, dx=0.110 m, dy=0.017 m, yaw=0.170 rad
+0: 256x416 1 drone, Done. (0.142s)
+[120] drone conf=0.45, depth=0.70 m, dx=0.117 m, dy=0.020 m, yaw=0.165 rad
+0: 256x416 1 drone, Done. (0.125s)
+[121] drone conf=0.56, depth=0.85 m, dx=0.128 m, dy=0.016 m, yaw=0.150 rad
+0: 256x416 1 drone, Done. (0.166s)
+[122] drone conf=0.27, depth=0.91 m, dx=0.118 m, dy=-0.001 m, yaw=0.129 rad
+0: 256x416 1 drone, Done. (0.203s)
+[123] drone conf=0.43, depth=0.88 m, dx=0.099 m, dy=-0.029 m, yaw=0.112 rad
+0: 256x416 1 drone, Done. (0.109s)
+[124] drone conf=0.38, depth=0.78 m, dx=0.081 m, dy=-0.041 m, yaw=0.104 rad
+0: 256x416 1 drone, Done. (0.135s)
+[125] drone conf=0.34, depth=0.86 m, dx=0.080 m, dy=-0.051 m, yaw=0.093 rad
+0: 256x416 1 drone, Done. (0.132s)
+
+
+
+448
+
+
+349] drone conf=0.45, depth=0.76 m, dx=0.009 m, dy=0.032 m, yaw=0.012 rad
+0: 256x448 1 drone, Done. (0.118s)
+[350] drone conf=0.44, depth=0.65 m, dx=0.027 m, dy=0.023 m, yaw=0.042 rad
+0: 256x448 1 drone, Done. (0.202s)
+[351] drone conf=0.51, depth=0.74 m, dx=0.040 m, dy=0.003 m, yaw=0.054 rad
+0: 256x448 1 drone, Done. (0.198s)
+[352] drone conf=0.61, depth=0.83 m, dx=0.054 m, dy=0.001 m, yaw=0.065 rad
+0: 256x448 1 drone, Done. (0.186s)
+[353] drone conf=0.57, depth=0.72 m, dx=0.063 m, dy=-0.005 m, yaw=0.087 rad
+0: 256x448 1 drone, Done. (0.121s)
+[354] drone conf=0.50, depth=0.75 m, dx=0.058 m, dy=-0.011 m, yaw=0.077 rad
+0: 256x448 1 drone, Done. (0.140s)
+[355] drone conf=0.58, depth=0.74 m, dx=0.065 m, dy=-0.014 m, yaw=0.088 rad
+0: 256x448 1 drone, Done. (0.202s)
+[356] drone conf=0.56, depth=0.78 m, dx=0.073 m, dy=-0.017 m, yaw=0.093 rad
+0: 256x448 1 drone, Done. (0.118s)
+[357] drone conf=0.56, depth=0.75 m, dx=0.071 m, dy=-0.018 m, yaw=0.094 rad
+0: 256x448 1 drone, Done. (0.138s)
+
+
+480
+
+
+[92] drone conf=0.46, depth=0.95 m, dx=0.105 m, dy=0.013 m, yaw=0.110 rad
+0: 288x480 1 drone, Done. (0.209s)
+[93] drone conf=0.58, depth=1.01 m, dx=0.128 m, dy=0.017 m, yaw=0.126 rad
+0: 288x480 1 drone, Done. (0.204s)
+[94] drone conf=0.46, depth=0.86 m, dx=0.127 m, dy=0.037 m, yaw=0.146 rad
+0: 288x480 1 drone, Done. (0.196s)
+[95] drone conf=0.51, depth=0.89 m, dx=0.144 m, dy=0.042 m, yaw=0.160 rad
+0: 288x480 1 drone, Done. (0.190s)
+[96] drone conf=0.52, depth=0.82 m, dx=0.141 m, dy=0.040 m, yaw=0.170 rad
+0: 288x480 1 drone, Done. (0.138s)
+[97] drone conf=0.47, depth=0.71 m, dx=0.132 m, dy=0.031 m, yaw=0.183 rad
+0: 288x480 1 drone, Done. (0.211s)
+[98] drone conf=0.51, depth=0.92 m, dx=0.178 m, dy=0.034 m, yaw=0.191 rad
+0: 288x480 1 drone, Done. (0.197s)
+[99] drone conf=0.51, depth=0.97 m, dx=0.187 m, dy=0.034 m, yaw=0.190 rad
+0: 288x480 1 drone, Done. (0.202s)
+[100] drone conf=0.46, depth=0.82 m, dx=0.149 m, dy=0.016 m, yaw=0.181 rad
+0: 288x480 1 drone, Done. (0.188s)
+
+
+640
+
+
+[181] drone conf=0.49, depth=0.89 m, dx=0.081 m, dy=0.026 m, yaw=0.091 rad
+0: 384x640 1 drone, Done. (0.206s)
+[182] drone conf=0.44, depth=0.80 m, dx=0.048 m, dy=0.006 m, yaw=0.060 rad
+0: 384x640 1 drone, Done. (0.216s)
+[183] drone conf=0.46, depth=0.85 m, dx=0.055 m, dy=-0.000 m, yaw=0.065 rad
+0: 384x640 1 drone, Done. (0.209s)
+[184] drone conf=0.40, depth=0.88 m, dx=0.062 m, dy=0.008 m, yaw=0.070 rad
+0: 384x640 1 drone, Done. (0.209s)
+[185] drone conf=0.35, depth=1.05 m, dx=0.089 m, dy=0.001 m, yaw=0.084 rad
+0: 384x640 1 drone, Done. (0.205s)
+[186] drone conf=0.28, depth=1.07 m, dx=0.093 m, dy=-0.005 m, yaw=0.087 rad
+0: 384x640 1 drone, Done. (0.212s)
+[187] drone conf=0.33, depth=1.16 m, dx=0.100 m, dy=-0.004 m, yaw=0.086 rad
+0: 384x640 1 drone, Done. (0.211s)
+[188] drone conf=0.30, depth=1.07 m, dx=0.099 m, dy=0.012 m, yaw=0.092 rad
+0: 384x640 1 drone, Done. (0.207s)
+[189] drone conf=0.38, depth=1.00 m, dx=0.074 m, dy=-0.003 m, yaw=0.074 rad
+0: 384x640 1 drone, Done. (0.210s)
+
+
+704
+
+
+jiancebuchu 
+
+

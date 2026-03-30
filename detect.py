@@ -29,14 +29,14 @@ import libcamera
 from picamera2 import Picamera2
 from datalink_serial import datalink
 
-W_img = 960
-H_img = 540
-FOV_x = 77
-FOV_y = 44
-W_real = 0.8
-H_real = 1.7
-safe_distance = 1.0
-k = 1.0
+W_img = 1280  #图像宽度（像素）
+H_img = 720
+FOV_x = 77  #水平视场角（度）
+FOV_y = 44 
+W_real = 0.1  #目标的实际宽度（米）
+H_real = 1.7  #目标实际高度
+safe_distance = 1.0  #期望距离目标保持的距离
+k = 1.0  #经验调节系数（目前为 1.0）
 Kp_dx = 0.5
 Kp_dy = 0.5
 Kp_dalt = 0.5
@@ -99,7 +99,7 @@ def detect(save_img=False):
         pred = model(img, augment=opt.augment)[0]
 
         # Apply NMS
-        pred = non_max_suppression(pred, opt.conf_thres, opt.iou_thres, classes=opt.classes, agnostic=opt.agnostic_nms)
+        pred = non_max_suppression(pred, opt.conf_thres, opt.iou_thres, classes=[0], agnostic=opt.agnostic_nms)
         t2 = time_synchronized()
 
         # Apply Classifier
@@ -141,8 +141,10 @@ def detect(save_img=False):
                         label = f'{names[int(cls)]} {conf:.2f}'
                         plot_one_box(xyxy, im0, label=label, color=colors[int(cls)], line_thickness=3)
                         
-                    f_x = (W_img / 2) / np.tan(np.radians(FOV_x / 2))
-                    f_y = (H_img / 2) / np.tan(np.radians(FOV_y / 2))
+                    # f_x = (W_img / 2) / np.tan(np.radians(FOV_x / 2))
+                    f_x = 2120
+                    # f_y = (H_img / 2) / np.tan(np.radians(FOV_y / 2))
+                    f_y = 2120
                     x1, y1, x2, y2 = xyxy
                     W_qr = x2 - x1
                     H_qr = y2 - y1
@@ -167,6 +169,10 @@ def detect(save_img=False):
                     d_yaw = angle_x_rad
     
                     dl.set_pose(Kp_dx * dx_1, Kp_dy * dy_1, Kp_dalt * d_alt_1, Kp_dyaw * d_yaw)
+                    
+                    print(f"[{frame}] {names[int(cls)]} conf={conf:.2f}, "f"depth={dz_m:.2f} m, "f"dx={dy_1:.3f} m, "f"dy={d_alt_1:.3f} m, "f"yaw={d_yaw:.3f} rad")
+
+    
                     
 
             # Print time (inference + NMS)
@@ -211,9 +217,9 @@ if __name__ == '__main__':
     data_thread.start()
     heartbeat_thread.start()
     parser = argparse.ArgumentParser()
-    parser.add_argument('--weights', nargs='+', type=str, default='/home/pi/YOLOv5-Lite/weights/v5lite-s.pt', help='model.pt path(s)')
+    parser.add_argument('--weights', nargs='+', type=str, default='/home/pi/YOLOv5-Lite/weights/best.pt', help='model.pt path(s)')
     parser.add_argument('--source', type=str, default='0', help='source')  # file/folder, 0 for webcam
-    parser.add_argument('--img-size', type=int, default=256, help='inference size (pixels)')
+    parser.add_argument('--img-size', type=int, default=416, help='inference size (pixels)')
     parser.add_argument('--conf-thres', type=float, default=0.25, help='object confidence threshold')
     parser.add_argument('--iou-thres', type=float, default=0.5, help='IOU threshold for NMS')
     parser.add_argument('--device', default='', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
