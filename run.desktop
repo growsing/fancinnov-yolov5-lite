@@ -1,0 +1,5 @@
+[Desktop Entry]
+Type=Application
+Name=MyPythonScript
+Exec=lxterminal --command "/bin/bash -c 'source /home/pi/YOLOv5-Lite/venv-yolo/bin/activate && python /home/pi/YOLOv5-Lite/detect.py'"
+
