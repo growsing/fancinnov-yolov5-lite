@@ -127,9 +127,12 @@ def detect(save_img=False):
                     # if int(c) == 0:
                     n = (det[:, -1] == c).sum()  # detections per class
                     s += f"{n} {names[int(c)]}{'s' * (n > 1)}, "  # add to string
+                    
+                # 找到最高置信度索引
+                max_conf_idx = torch.argmax(det[:, 4])
 
                 # Write results
-                for *xyxy, conf, cls in reversed(det):
+                for idx, (*xyxy, conf, cls) in enumerate(det):
                     # if int(cls) == 0:
                     if save_txt:  # Write to file
                         xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
@@ -140,37 +143,38 @@ def detect(save_img=False):
                     if save_img or view_img:  # Add bbox to image
                         label = f'{names[int(cls)]} {conf:.2f}'
                         plot_one_box(xyxy, im0, label=label, color=colors[int(cls)], line_thickness=3)
-                        
-                    # f_x = (W_img / 2) / np.tan(np.radians(FOV_x / 2))
-                    f_x = 2120
-                    # f_y = (H_img / 2) / np.tan(np.radians(FOV_y / 2))
-                    f_y = 2120
-                    x1, y1, x2, y2 = xyxy
-                    W_qr = x2 - x1
-                    H_qr = y2 - y1
-    
-                    cx_qr = (x1 + x2) / 2
-                    cy_qr = (y1 + y2) / 2
-    
-                    cx_img = W_img / 2
-                    cy_img = H_img / 2
-    
-                    dx = cx_qr - cx_img
-                    dy = cy_qr - cy_img
-    
-                    angle_x_rad = k * np.arctan(dx / f_x)
-                    dz_m = k * (W_real * f_x) / W_qr
-                    dy_m = k * (dy / f_y) * dz_m
-                    dx_m = k * (dx / f_x) * dz_m
-    
-                    dx_1 = dz_m - safe_distance
-                    dy_1 = dx_m
-                    d_alt_1 = -dy_m
-                    d_yaw = angle_x_rad
-    
-                    dl.set_pose(Kp_dx * dx_1, Kp_dy * dy_1, Kp_dalt * d_alt_1, Kp_dyaw * d_yaw)
                     
-                    print(f"[{frame}] {names[int(cls)]} conf={conf:.2f}, "f"depth={dz_m:.2f} m, "f"dx={dy_1:.3f} m, "f"dy={d_alt_1:.3f} m, "f"yaw={d_yaw:.3f} rad")
+                    if idx == max_conf_idx:    
+                      # f_x = (W_img / 2) / np.tan(np.radians(FOV_x / 2))
+                      f_x = 2120
+                      # f_y = (H_img / 2) / np.tan(np.radians(FOV_y / 2))
+                      f_y = 2120
+                      x1, y1, x2, y2 = xyxy
+                      W_qr = x2 - x1
+                      H_qr = y2 - y1
+      
+                      cx_qr = (x1 + x2) / 2
+                      cy_qr = (y1 + y2) / 2
+      
+                      cx_img = W_img / 2
+                      cy_img = H_img / 2
+      
+                      dx = cx_qr - cx_img
+                      dy = cy_qr - cy_img
+      
+                      angle_x_rad = k * np.arctan(dx / f_x)
+                      dz_m = k * (W_real * f_x) / W_qr
+                      dy_m = k * (dy / f_y) * dz_m
+                      dx_m = k * (dx / f_x) * dz_m
+      
+                      dx_1 = dz_m - safe_distance
+                      dy_1 = dx_m
+                      d_alt_1 = -dy_m
+                      d_yaw = angle_x_rad
+      
+                      dl.set_pose(Kp_dx * dx_1, Kp_dy * dy_1, Kp_dalt * d_alt_1, Kp_dyaw * d_yaw)
+                    
+                      print(f"[{frame}] {names[int(cls)]} conf={conf:.2f}, "f"depth={dz_m:.2f} m, "f"dx={dy_1:.3f} m, "f"dy={d_alt_1:.3f} m, "f"yaw={d_yaw:.3f} rad")
 
     
                     
@@ -178,12 +182,14 @@ def detect(save_img=False):
             # Print time (inference + NMS)
             print(f'{s}Done. ({t2 - t1:.3f}s)')
 
-            # Stream results
+            # Stream results 摄像头实时展示
+            view_img = 0
             if view_img:
                 cv2.imshow(str(p), im0)
                 cv2.waitKey(1)  # 1 millisecond
 
-            # Save results (image with detections)
+            # Save results (image with detections) 保存视频
+            save_img = 1
             if save_img:
                 if dataset.mode == 'image':
                     cv2.imwrite(save_path, im0)
