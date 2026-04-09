@@ -42,6 +42,24 @@ Kp_dy = 0.5
 Kp_dalt = 0.5
 Kp_dyaw = 0.3
 
+def status_loop(dl):
+    """每隔1秒打印一次无人机状态（高度、电池、位置等）"""
+    while True:
+        # 读取当前状态，若属性不存在则使用默认值
+        alt = getattr(dl, 'relative_alt', 0.0)
+        batt_v = getattr(dl, 'batt_voltage', 0.0)
+        batt_i = getattr(dl, 'batt_current', 0.0)
+        pos_x = getattr(dl, 'pos_x', 0.0)
+        pos_y = getattr(dl, 'pos_y', 0.0)
+        pos_z = getattr(dl, 'pos_z', 0.0)
+        yaw = getattr(dl, 'att_yaw', 0.0)
+        
+        # 打印状态（使用 \r 可以在一行内刷新，但考虑到可能有其他输出，这里直接换行打印）
+        print(f"[Status] Alt: {alt:.2f}m | Batt: {batt_v:.1f}V {batt_i:.1f}A | "
+              f"Pos: ({pos_x:.1f}, {pos_y:.1f}, {pos_z:.1f}) | Yaw: {yaw:.2f}rad")
+        time.sleep(1)
+
+
 def detect(save_img=False):
     source, weights, view_img, save_txt, imgsz = opt.source, opt.weights, opt.view_img, opt.save_txt, opt.img_size
     save_img = not opt.nosave and not source.endswith('.txt')  # save inference images
@@ -222,6 +240,12 @@ if __name__ == '__main__':
     heartbeat_thread = threading.Thread(target=dl.heartbeat)
     data_thread.start()
     heartbeat_thread.start()
+    
+    # 启动状态打印线程
+    status_thread = threading.Thread(target=status_loop, args=(dl,), daemon=True)
+    status_thread.start()
+    
+    
     parser = argparse.ArgumentParser()
     parser.add_argument('--weights', nargs='+', type=str, default='/home/pi/YOLOv5-Lite/weights/best.pt', help='model.pt path(s)')
     parser.add_argument('--source', type=str, default='0', help='source')  # file/folder, 0 for webcam
