@@ -236,7 +236,6 @@ def detect(save_img=False):
                     cv2.waitKey(1)
 
                 # Save results (image with detections) 保存视频
-                # Save results (image with detections) 保存视频
                 save_img = 1
                 if save_img:
                     if dataset.mode == 'image':
