@@ -13,6 +13,7 @@ detect_control.py — 单字母命令遥控 + YOLO 视觉跟踪 + MiDaS 实时�
 - 右侧窗口：MiDaS_small 实时彩色深度图（Inferno 映射）
 - 同时保存原始跟踪视频和深度视频
 - 状态日志与深度日志独立保存
+- 时间单位统一为秒，深度输出为原始相对值（非米制）
 """
 
 import argparse
@@ -47,13 +48,7 @@ try:
     import timm
 except ImportError:
     raise ImportError("请先安装 timm: pip install timm")
-# 可选：matplotlib 用于生成彩色深度图（若不安装可用 OpenCV 的 `applyColorMap` 代替）
-try:
-    import matplotlib.pyplot as plt
-except ImportError:
-    print("未安装 matplotlib，将使用 OpenCV color map 替代")
 
-# MiDaS 全局模型（只加载一次）
 midas_model = None
 midas_transform = None
 midas_device = None
@@ -78,6 +73,7 @@ def load_midas_once():
 def run_midas_full(rgb_image):
     """
     输入 RGB 图像 (H,W,3)，返回全分辨率深度图 (H,W) numpy 数组
+    注意：MiDaS 输出为相对深度（原始值），单位任意，仅表示相对远近
     """
     input_batch = midas_transform(rgb_image).to(midas_device)
     with torch.no_grad():
@@ -92,18 +88,14 @@ def run_midas_full(rgb_image):
 
 
 def depth_to_colormap(depth_map, min_depth=None, max_depth=None):
-    """
-    将深度图转换为彩色图像 (BGR) 用于显示/保存
-    """
+    """将相对深度图转换为彩色图像 (BGR) 用于显示/保存"""
     if min_depth is None:
         min_depth = np.min(depth_map)
     if max_depth is None:
         max_depth = np.max(depth_map)
-    # 归一化到 0-1
     depth_norm = (depth_map - min_depth) / (max_depth - min_depth + 1e-8)
     depth_norm = np.clip(depth_norm, 0, 1)
     depth_uint8 = (depth_norm * 255).astype(np.uint8)
-    # 使用 OpenCV 的 Inferno 颜色映射（需要 OpenCV >= 4.2，否则使用 JET 等）
     try:
         colored = cv2.applyColorMap(depth_uint8, cv2.COLORMAP_INFERNO)
     except:
@@ -112,12 +104,9 @@ def depth_to_colormap(depth_map, min_depth=None, max_depth=None):
 
 
 def get_roi_depth_median(depth_map, xyxy):
-    """
-    从全图深度图中提取目标框内的中值深度（扩大10%框）
-    """
+    """从全图深度图中提取目标框内的中值深度（扩大10%框）"""
     x1, y1, x2, y2 = map(int, xyxy)
     h, w = depth_map.shape
-    # 扩大框：向内偏移一点，避免边缘噪声
     pad_w = max(1, int(0.1 * (x2 - x1)))
     pad_h = max(1, int(0.1 * (y2 - y1)))
     x1 = max(0, x1 - pad_w)
@@ -130,7 +119,7 @@ def get_roi_depth_median(depth_map, xyxy):
     return float(np.median(roi))
 
 
-# ================= 原有常量（保持不变） =================
+# ================= 原有常量 =================
 W_img, H_img = 1280, 720
 FOV_x, FOV_y = 77, 44
 W_real = 0.1
@@ -144,9 +133,8 @@ dl = None
 stop_track_event = threading.Event()
 
 
-# ================= 状态线程（保留原样） =================
 def status_loop(dl_obj, log_path):
-    """每秒打印无人机状态并写入日志文件，低压时红色警告"""
+    """每秒打印无人机状态并写入日志文件"""
     with open(log_path, 'a', buffering=1) as f:
         while True:
             alt = getattr(dl_obj, 'relative_alt', 0.0)
@@ -170,7 +158,6 @@ def status_loop(dl_obj, log_path):
             time.sleep(1)
 
 
-# ================= 跟踪循环（双窗口显示 + 深度视频保存） =================
 def tracking_loop(opt, dl_obj, base_dir):
     stop_track_event.clear()
     source, weights, save_txt, imgsz = opt.source, opt.weights, opt.save_txt, opt.img_size
@@ -182,11 +169,15 @@ def tracking_loop(opt, dl_obj, base_dir):
     save_dir = base_dir
     (save_dir / 'labels' if save_txt else save_dir).mkdir(parents=True, exist_ok=True)
 
-    # 深度日志文件
+    # 深度日志文件（增加字段说明）
     depth_log_path = save_dir / f'depth_log_{datetime.now().strftime("%Y%m%d_%H%M%S")}.txt'
     depth_log_f = open(depth_log_path, 'w', encoding='utf-8')
     depth_log_f.write(f"Depth Log started at {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
-    depth_log_f.write("=" * 60 + "\n")
+    depth_log_f.write("=" * 80 + "\n")
+    depth_log_f.write("NOTE: midas_depth is raw relative depth (not meters). All times in seconds.\n")
+    depth_log_f.write("Fields: timestamp, event, conf, box(x1,y1,x2,y2), center_offset(dx,dy), "
+                     "model_dist(m), dx_m, dy_m, d_alt(m), d_yaw(rad), midas_raw, inference_time(s), depth_time(s)\n")
+    depth_log_f.write("=" * 80 + "\n")
     depth_log_f.flush()
 
     # 设备与模型（YOLO）
@@ -201,7 +192,7 @@ def tracking_loop(opt, dl_obj, base_dir):
 
     # 数据加载
     vid_path, vid_writer = None, None
-    depth_vid_path, depth_vid_writer = None, None   # 深度视频
+    depth_vid_path, depth_vid_writer = None, None
     if webcam:
         cudnn.benchmark = True
         dataset = LoadPicamera2(source, img_size=imgsz, stride=stride)
@@ -223,7 +214,6 @@ def tracking_loop(opt, dl_obj, base_dir):
     lost_start_time = None
     last_no_target_print = 0
 
-    # 加载 MiDaS 模型（仅一次）
     load_midas_once()
 
     try:
@@ -250,34 +240,27 @@ def tracking_loop(opt, dl_obj, base_dir):
             pred = non_max_suppression(pred, opt.conf_thres, opt.iou_thres,
                                        classes=[0], agnostic=opt.agnostic_nms)
             t2 = time_synchronized()
-            inference_time = t2 - t1
+            inference_time = t2 - t1   # 秒
 
             det = pred[0] if len(pred) > 0 else []
             im0 = im0s.copy() if isinstance(im0s, np.ndarray) else im0s[0].copy()
 
-            # ===== ⭐ 每帧进行全图深度估计（无论有无目标） =====
+            # 全图深度估计（相对深度原始值）
             rgb_for_depth = cv2.cvtColor(im0, cv2.COLOR_BGR2RGB)
             t_depth_start = time.time()
-            depth_map = run_midas_full(rgb_for_depth)          # 全图深度
-            depth_time = (time.time() - t_depth_start) * 1000  # ms
+            depth_map = run_midas_full(rgb_for_depth)
+            depth_time = time.time() - t_depth_start   # 秒
 
-            # 生成彩色深度图用于显示和保存
             colored_depth = depth_to_colormap(depth_map)
 
-            # 根据有无目标获取深度值（用于日志/控制显示）
-            target_depth = -1.0
-            if len(det) > 0:
-                # 后续处理时会更新最可信目标的框，这里先占位，后面会重新计算
-                pass
-
-            # ========= 控制决策 =========
+            # 控制决策
             if len(det) == 0:
                 now = time.time()
                 if lost_start_time is None:
                     lost_start_time = now
                     dl_obj.set_pose(0, 0, 0, 0)
                     print(f"[丢失目标] 悬停，开始计时 (5秒后自动旋转搜寻)")
-                    depth_log_f.write(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 丢失目标\n")
+                    depth_log_f.write(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] LOST_TARGET action=hover\n")
                 else:
                     elapsed = now - lost_start_time
                     if elapsed >= 5.0:
@@ -288,26 +271,20 @@ def tracking_loop(opt, dl_obj, base_dir):
                         dl_obj.set_pose(0, 0, 0, 0)
 
                 if time.time() - last_no_target_print >= 1.0:
-                    # 计算画面中心深度（简单均值）
                     h, w = depth_map.shape
                     center_depth = np.mean(depth_map[h//4:3*h//4, w//4:3*w//4])
                     print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] [YOLO] no target | "
-                          f"[MiDaS] center_depth≈{center_depth:.2f}m")
-                    last_no_target_print = time.time()
-                    # 无目标时记录中心区域深度
-                    h, w = depth_map.shape
-                    center_depth = np.mean(depth_map[h//4:3*h//4, w//4:3*w//4])
-                    depth_log_f.write(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 无目标 center_depth={center_depth:.2f}m\n")
+                          f"[MiDaS] center_depth={center_depth:.2f} raw | depth_time={depth_time:.3f}s")
+                    depth_log_f.write(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] NO_TARGET center_depth={center_depth:.2f} raw depth_time={depth_time:.3f}s\n")
                     depth_log_f.flush()
+                    last_no_target_print = time.time()
             else:
-                # 恢复跟踪
                 if lost_start_time is not None:
                     print("[恢复跟踪] 重新检测到目标，停止旋转")
-                    depth_log_f.write(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 恢复跟踪\n")
+                    depth_log_f.write(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] TRACK_RECOVERED\n")
                     lost_start_time = None
                     dl_obj.set_pose(0, 0, 0, 0)
 
-                # 处理检测结果：只保留置信度最高的目标
                 det[:, :4] = scale_coords(img.shape[2:], det[:, :4], im0.shape).round()
                 max_conf_idx = torch.argmax(det[:, 4])
 
@@ -323,11 +300,10 @@ def tracking_loop(opt, dl_obj, base_dir):
                             f.write(('%g ' * len(line)).rstrip() % line + '\n')
 
                     if idx == max_conf_idx:
-                        # 绘制检测框
                         label = f'{names[int(cls)]} {conf:.2f}'
                         plot_one_box(xyxy, im0, label=label, color=colors[int(cls)], line_thickness=3)
 
-                        # 原有控制量计算
+                        # 控制量计算
                         f_x = f_y = 2120
                         x1, y1, x2, y2 = xyxy
                         W_qr = x2 - x1
@@ -347,33 +323,38 @@ def tracking_loop(opt, dl_obj, base_dir):
                         d_alt_1 = -dy_m
                         d_yaw = angle_x_rad
 
-                        # 从全图深度图中提取目标区域深度
-                        target_depth = get_roi_depth_median(depth_map, xyxy)
+                        target_depth_raw = get_roi_depth_median(depth_map, xyxy)
 
-                        # 发送控制指令
                         try:
                             dl_obj.set_pose(Kp_dx * dx_1, Kp_dy * dy_1,
                                             Kp_dalt * d_alt_1, Kp_dyaw * d_yaw)
                         except Exception as e:
                             print(f"控制发送失败: {e}")
 
-                        # 终端输出（含深度信息）
                         ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                        print(f"[{ts}] [YOLO] conf={conf:.2f} dist={dz_m:.2f}m infer={inference_time:.2f}s | "
-                              f"[MiDaS] depth={target_depth:.2f}m cost={depth_time:.0f}ms")
-                        depth_log_f.write(f"[{ts}] DETECT drone conf={conf:.2f} "
-                                          f"model_dist={dz_m:.2f}m midas_depth={target_depth:.2f}m "
-                                          f"infer={inference_time:.3f}s depth_ms={depth_time:.0f}\n")
+                        print(f"[{ts}] [YOLO] conf={conf:.2f} dist={dz_m:.2f}m infer={inference_time:.3f}s | "
+                              f"[MiDaS] depth={target_depth_raw:.2f} raw cost={depth_time:.3f}s")
+
+                        # 详细日志：目标框、偏移、相对位移等
+                        depth_log_f.write(
+                            f"[{ts}] DETECT "
+                            f"conf={conf:.3f} "
+                            f"box=({x1},{y1},{x2},{y2}) "
+                            f"center_offset=({dx:.1f},{dy:.1f}) "
+                            f"model_dist={dz_m:.3f}m "
+                            f"dx_m={dx_m:.3f}m dy_m={dy_m:.3f}m d_alt={d_alt_1:.3f}m "
+                            f"d_yaw={d_yaw:.3f}rad "
+                            f"midas_raw={target_depth_raw:.2f} "
+                            f"inference_time={inference_time:.3f}s depth_time={depth_time:.3f}s\n"
+                        )
                         depth_log_f.flush()
 
-            # ===== 双窗口显示 =====
+            # 双窗口显示
             if view_img:
-                # 左窗口：YOLO 跟踪结果
                 cv2.namedWindow("YOLOv5 Tracking", cv2.WINDOW_NORMAL)
                 cv2.resizeWindow("YOLOv5 Tracking", 640, 360)
                 cv2.imshow("YOLOv5 Tracking", im0)
 
-                # 右窗口：MiDaS 深度图（彩色）
                 cv2.namedWindow("MiDaS Depth", cv2.WINDOW_NORMAL)
                 cv2.resizeWindow("MiDaS Depth", 640, 360)
                 cv2.imshow("MiDaS Depth", colored_depth)
@@ -384,12 +365,10 @@ def tracking_loop(opt, dl_obj, base_dir):
                     stop_track_event.set()
                     break
             else:
-                # 即使不显示窗口，也要执行 waitKey 使 OpenCV 事件循环运行（避免卡死）
                 cv2.waitKey(1)
 
-            # ===== 保存视频（原图 + 深度图） =====
+            # 保存视频
             if save_img:
-                # 原始跟踪视频
                 if dataset.mode == 'image':
                     cv2.imwrite(str(save_dir / Path(path).name), im0)
                 else:
@@ -402,25 +381,18 @@ def tracking_loop(opt, dl_obj, base_dir):
                             w = int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH))
                             h = int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
                         else:
-                            fps, w, h = 15, im0.shape[1], im0.shape[0]   # 未获取到摄像头信息时默认15fps
+                            fps, w, h = 15, im0.shape[1], im0.shape[0]
                         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
                         vid_writer = cv2.VideoWriter(vid_path, fourcc, fps, (w, h))
-
                     vid_writer.write(im0)
 
-                # 深度视频
                 if depth_vid_path != str(save_dir / 'depth_output.mp4'):
                     depth_vid_path = str(save_dir / 'depth_output.mp4')
                     if isinstance(depth_vid_writer, cv2.VideoWriter):
                         depth_vid_writer.release()
-                    # 深度图尺寸可能与原图相同
                     dh, dw = colored_depth.shape[:2]
-                    if vid_cap:
-                        depth_fps = fps
-                    else:
-                        depth_fps = 15
+                    depth_fps = fps if vid_cap else 15
                     depth_vid_writer = cv2.VideoWriter(depth_vid_path, fourcc, depth_fps, (dw, dh))
-
                 depth_vid_writer.write(colored_depth)
 
             if stop_track_event.is_set():
@@ -439,7 +411,6 @@ def tracking_loop(opt, dl_obj, base_dir):
         print(f"跟踪循环结束 (总耗时 {time.time() - t0:.3f}s)")
 
 
-# ================= 命令处理（保留所有功能） =================
 def execute_command(cmd_char, opt, base_dir):
     global dl, stop_track_event
     cmd_char = cmd_char.lower()
@@ -469,7 +440,6 @@ def execute_command(cmd_char, opt, base_dir):
         print("? 支持命令: a(解锁) d(上锁) t(起飞) l(降落) k(跟踪+深度) h(悬停)")
 
 
-# ================= 主入口（保持不变） =================
 def main():
     global dl
 
