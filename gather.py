@@ -104,9 +104,9 @@ TX_INTERVAL = 0.25        # 发射间隔（秒）
 
 # ---- 方向映射 (MCP3008 通道 → 方向) ----
 # 圆周阵列: 0=前, 1=右, 2=后, 3=左
-CHANNEL_TO_DIR = {0: "前", 1: "右", 2: "后", 3: "左"}
+CHANNEL_TO_DIR = {0: "右", 1: "后", 2: "左", 3: "前"}
 # 通道对应的角度 (度)
-CHANNEL_TO_ANGLE = {0: 0, 1: 90, 2: 180, 3: 270}
+CHANNEL_TO_ANGLE = {0: 90, 1: 180, 2: 270, 3: 0}
 
 # ---- 四向运动控制 (dx, dy, d_alt, d_yaw) ----
 DIR_TO_CONTROL = {
@@ -121,14 +121,14 @@ NOISE_FLOOR = 608        # 无信号时的 ADC 底噪读数
 
 # ---- 距离控制阈值 (基于向量模长) ----
 # 模长 = sqrt(Σ(signal_i²)), signal_i = max(0, 读数_i - 底噪)
-MOD_RELIABLE = 80        # 模长可靠阈值, 超过此值认为信号有效
+MOD_RELIABLE = 5        # 模长可靠阈值, 超过此值认为信号有效
 MOD_APPROACH = 100       # 低于此值: 距离较远，主动靠近
-MOD_HOLD = 300           # 此值附近: 距离适中，悬停保持
-MOD_RETREAT = 500        # 高于此值: 距离过近，反向远离
+MOD_HOLD = 150           # 此值附近: 距离适中，悬停保持
+MOD_RETREAT = 280        # 高于此值: 距离过近，反向远离
 
 # ---- 运动速度参数 ----
-SPEED_APPROACH = 0.3     # 靠近速度 (m/s)
-SPEED_RETREAT = -0.3     # 远离速度 (m/s)
+SPEED_APPROACH = 0.1     # 靠近速度 (m/s)
+SPEED_RETREAT = -0.1     # 远离速度 (m/s)
 YAW_SEARCH_SPEED = 0.2   # 搜寻自旋速度 (rad/s)
 
 # ---- 控制增益 ----
